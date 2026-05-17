@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Bulletin de Notes — SGE</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f9f9f9; color: #333; }
+        .container { max-width: 860px; margin: 32px auto; padding: 0 16px; }
+        .bulletin-card {
+          background: #fff; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,.12);
+          padding: 36px 40px;
+        }
+        .bulletin-title {
+          text-align: center; color: #1e3a5f; border-bottom: 3px solid #1e3a5f;
+          padding-bottom: 12px; margin-bottom: 8px; font-size: 1.6rem; font-weight: 700;
+        }
+        .annee { text-align: center; color: #555; margin-bottom: 24px; font-size: 1rem; }
+        .info-etudiant { background: #eef2f7; border-radius: 6px; padding: 14px 20px; margin-bottom: 28px; }
+        .info-etudiant p { margin: 4px 0; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+        thead tr { background: #1e3a5f; color: #fff; }
+        th, td { padding: 11px 14px; text-align: left; border: 1px solid #ddd; }
+        tbody tr:nth-child(even) { background: #f5f7fa; }
+        .row-total { background: #d9e4f5 !important; font-weight: bold; }
+        .synthese { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        .synthese td { padding: 10px 14px; border: 1px solid #ddd; }
+        .synthese .label { background: #eef2f7; font-weight: bold; width: 40%; }
+        .badge-admis   { background: #28a745; color: #fff; padding: 4px 14px; border-radius: 14px; font-weight: bold; }
+        .badge-ajourné { background: #dc3545; color: #fff; padding: 4px 14px; border-radius: 14px; font-weight: bold; }
+        .note-bas { border-top: 1px solid #ddd; margin-top: 20px; padding-top: 14px;
+                    color: #777; font-size: .85rem; font-style: italic; }
+        .btn-retour { display: inline-block; margin-bottom: 20px; background: #1e3a5f; color: #fff;
+                      padding: 9px 18px; border-radius: 4px; text-decoration: none; }
+        .btn-retour:hover { background: #2c5282; }
+        .topbar { margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; }
+        .user { color: #1e3a5f; font-weight: 700; }
+        .logout button { background: #1e3a5f; color: #fff; border: 0; padding: 8px 14px; border-radius: 4px; cursor: pointer; }
+        .logout button:hover { background: #2c5282; }
+    </style>
+    <div class="user">
+        <span th:text="${#authentication.name}">username</span>
+    </div>
+</head>
+<body>
+<div class="container">
+    <div class="topbar">
+    </div>
+
+    <a th:href="@{/bulletins}" class="btn-retour">← Retour à la liste</a>
+
+    <div class="bulletin-card">
+        <div class="bulletin-title">BULLETIN DE NOTES</div>
+        <div class="annee">Année Universitaire 2025 – 2026</div>
+
+        <div class="info-etudiant">
+            <p><strong>Étudiant :</strong>
+                <span th:text="${#strings.toUpperCase(bulletin.etudiant.nom)}">NOM</span>
+                <span th:text="${bulletin.etudiant.prenom}">Prénom</span>
+            </p>
+            <p><strong>Groupe :</strong>
+                <span th:text="${bulletin.etudiant.groupe}">Groupe</span>
+            </p>
+            <p><strong>Filière :</strong>
+                <span th:text="${bulletin.etudiant.filiere != null ? bulletin.etudiant.filiere.nom : '—'}">Filière</span>
+            </p>
+        </div>
+
+        <table>
+            <thead>
+            <tr>
+                <th>Module</th>
+                <th>Coefficient</th>
+                <th>Note /20</th>
+                <th>Somme (note × coef)</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="note : ${bulletin.notes}">
+                <td th:text="${note.module != null ? note.module.nom : '—'}">Module</td>
+                <td th:text="${note.module != null ? note.module.coefficient : 1}">1</td>
+                <td th:text="${#numbers.formatDecimal(note.valeur, 1, 2)}">0.00</td>
+                <td th:text="${#numbers.formatDecimal(note.valeur * (note.module != null ? note.module.coefficient : 1), 1, 2)}">0.00</td>
+            </tr>
+            <tr class="row-total">
+                <td colspan="1"><strong>Total</strong></td>
+                <td th:text="${bulletin.totalCoefficients}">0</td>
+                <td>—</td>
+                <td th:text="${#numbers.formatDecimal(bulletin.totalPondere, 1, 2)}">0.00</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <table class="synthese">
+            <tr>
+                <td class="label">Moyenne Générale</td>
+                <td><strong th:text="${#numbers.formatDecimal(bulletin.moyenneGenerale, 1, 2)}">0.00</strong></td>
+            </tr>
+            <tr>
+                <td class="label">Mention</td>
+                <td th:text="${bulletin.mention}">Mention</td>
+            </tr>
+            <tr>
+                <td class="label">Résultat</td>
+                <td>
+                    <span th:if="${bulletin.admis}" class="badge-admis">ADMIS</span>
+                    <span th:unless="${bulletin.admis}" class="badge-ajourné">AJOURNÉ</span>
+                </td>
+            </tr>
+        </table>
+
+        <div class="note-bas">
+            Ce bulletin est généré automatiquement par le Système de Gestion des Étudiants (SGE).
+            Il récapitule les notes obtenues au titre de l'année universitaire en cours et est
+            consultable à tout moment via l'interface web du projet.
+        </div>
+
+        <form th:action="@{/logout}" method="post">
+        <button type="submit">Dconnexion</button>
+</form>
+
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Connexion — SGE</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f9f9f9; color: #333; }
+        .container { max-width: 420px; margin: 80px auto; background: #fff; padding: 28px 28px;
+            border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,.12); }
+        h1 { margin: 0 0 18px; color: #1e3a5f; font-size: 1.4rem; }
+        label { display: block; margin: 12px 0 6px; font-weight: 700; }
+        input { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; }
+        button { margin-top: 16px; width: 100%; background: #1e3a5f; color: #fff; border: 0;
+            padding: 11px 14px; border-radius: 6px; cursor: pointer; font-weight: 700; }
+        button:hover { background: #2c5282; }
+        .hint { margin-top: 14px; color: #666; font-size: .9rem; line-height: 1.35; }
+        .links { margin-top: 10px; display: flex; justify-content: space-between; }
+        .links a { color: #1e3a5f; text-decoration: none; font-size: .9rem; }
+        .links a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Connexion</h1>
+    <form th:action="@{/auth/login-web}" method="post">
+        <label for="username">Username</label>
+        <input id="username" name="username" type="text" required/>
+
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" required/>
+
+        <button type="submit">Se connecter</button>
+    </form>
+    <div class="hint">
+        Après connexion, vous serez redirigé vers la page des bulletins.
+        Le token est stocké dans un cookie (dev) pour permettre l’accès depuis le navigateur.
+    </div>
+    <div class="links">
+        <a th:href="@{/bulletins}">Bulletins</a>
+        <form th:action="@{/auth/logout-web}" method="post">
+            <button type="submit" style="width:auto;background:transparent;color:#1e3a5f;padding:0;margin:0;font-weight:700;">
+                Déconnexion
+            </button>
+        </form>
+    </div>
+</div>
+</body>
+</html>
